@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Admin Page</title>
+  <style>
+    th, td {
+      border: 1px solid black;
+      text-align: center;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+
+<body>
+  <h2>Booking Requests:</h2>
+
+  <div id="tableContainer">
+    <table id="myTable"></table>
+
+    <input id="row" placeholder="Row"><br>
+    <button id="acceptButton">Accept</button>
+    <button id="rejectButton">Reject</button>
+    <p id="buttonText" style="margin-top: 0; color:red"></p>
+  </div>
+
+  <p id="tableText" style="margin-top: 0"></p>
+
+  <h2>Add Available Booking:</h2>
+
+  <div id="createBookingContainer">
+    <label for="date">Date:</label>
+    <input type="date" id="date"><br>
+    <p id="dateText" style="margin-top: 0; color:red"></p>
+    <label for="time">Time (e.g. 14:00):</label>
+    <input type="text" id="time"><br>
+    <p id="timeText" style="margin-top: 0; color:red"></p>
+    <label for="location">Location:</label>
+    <select id="location">
+      <option value="Burnham Centre">Burnham Centre</option>
+    </select><br><br>
+
+    <button id="createBookingButton">Create Booking</button>
+  </div>
+
+  <p id="resultText"></p>
+
+
+  <script type="module">
+    // Importing
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
+    import { getDatabase, ref, get, set, child, update, remove }
+      from "https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js"
+
+    // Functions
+
+    // Function to reformat the date because the date input gives it in the wrong format
+    function formatDateFromInput(inputString) {
+      var parts = inputString.split("-");
+      var date = parts[2] + "-" + parts[1] + "-" + parts[0];
+      return date;
+    }
+
+    // Function to convert the location into the format it is stored as in the title of the booking
+    function replaceSpacesWithHyphens(inputString) {
+      return inputString.replace(/ /g, "-");
+    }
+
+    function acceptBooking() {
+      var row = document.getElementById("row").value;
+
+      // If a valid row is entered then accept the request on that row
+      if (row === "" || parseInt(row) > requests.length - 1 || parseInt(row) == 0) {
+        buttonTextElement.textContent = "Please enter a valid row";
+      } else {
+        // Remove existing error messages
+        buttonTextElement.textContent = "";
+
+        // Update the database
+        var firstName = requests[row][0];
+        var lastName = requests[row][1];
+        var email = requests[row][2];
+        var comment = requests[row][3];
+        var location = requests[row][4];
+        var date = requests[row][5];
+        var time = requests[row][6];
+
+        set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+          "first-name": firstName,
+          "last-name": lastName,
+          "email": email,
+          "comment": comment,
+          "status": "accepted",
+          "location": location,
+          "date": date,
+          "time": time
+        })
+
+        // Set the row green
+        var rows = document.querySelectorAll("#myTable tr");
+
+        var rowCells = rows[row].querySelectorAll("td");
+        rowCells.forEach(function (cell) {
+          cell.style.color = "green";
+          cell.style.fontWeight = "bold";
+        });
+
+        // Clear the row input
+        document.getElementById("row").value = "";
+
+        // Compose an email
+        var subject = "Test Assessment Response";
+        var body = "Hi " + firstName + ",\n\nYour request for a booking on " + date + " at " + time + " in " + location + " has been accepted. We look forward to seeing you.\n\nRegards,\nAd Astra Tuition";
+
+        var mailtoURL = "mailto:" + encodeURIComponent(email) +
+          "?subject=" + encodeURIComponent(subject) +
+          "&body=" + encodeURIComponent(body);
+        
+        window.open(mailtoURL);
+      }
+    }
+
+    function rejectBooking() {
+      var row = document.getElementById("row").value;
+
+      // If a valid row is entered then reject the request on that row
+      if (row === "" || parseInt(row) > requests.length - 1 || parseInt(row) == 0) {
+        buttonTextElement.textContent = "Please enter a valid row";
+      } else {
+        // Remove existing error messages
+        buttonTextElement.textContent = "";
+
+        // Update the database
+        var location = requests[row][4];
+        var date = requests[row][5];
+        var time = requests[row][6];
+
+        set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+          "status": "available",
+          "location": location,
+          "date": date,
+          "time": time
+        })
+
+        // Set the row red
+        var rows = document.querySelectorAll("#myTable tr");
+
+        var rowCells = rows[row].querySelectorAll("td");
+        rowCells.forEach(function (cell) {
+          cell.style.color = "red";
+          cell.style.fontWeight = "bold";
+        });
+
+        // Clear the row input
+        document.getElementById("row").value = "";
+
+        // Compose an email
+        var firstName = requests[row][0];
+        var email = requests[row][2];
+
+        var subject = "Test Assessment Response";
+        var body = "Hi " + firstName + ",\n\nUnfortunately, your request for a booking on " + date + " at " + time + " in " + location + " has been rejected. Please try and request another time.\n\nRegards,\nAd Astra";
+
+        var mailtoURL = "mailto:" + encodeURIComponent(email) +
+          "?subject=" + encodeURIComponent(subject) +
+          "&body=" + encodeURIComponent(body);
+        
+        window.open(mailtoURL);
+      }
+    }
+
+    function insertBooking() {
+      var date = formatDateFromInput(document.getElementById("date").value);
+      var time = document.getElementById("time").value;
+      var location = document.getElementById("location").value;
+
+      set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+        "status": "available",
+        "location": location,
+        "date": date,
+        "time": time
+      })
+
+      resultTextElement.style.color = "green";
+      resultTextElement.textContent = "Added booking on " + date + " at " + time + " in " + location + ".";
+      document.getElementById("time").value = "";
+    }
+
+    function processInputs() {
+      var allInfoFilledCorrectly = true;
+
+      var unformattedDate = document.getElementById("date").value;
+      var parts = unformattedDate.split("-");
+      var date = parts[2] + "-" + parts[1] + "-" + parts[0];
+
+      if (date === "") {
+        dateTextElement.textContent = "Please select a date";
+        allInfoFilledCorrectly = false;
+      } else {
+        dateTextElement.textContent = "";
+      }
+
+      var time = document.getElementById("time").value;
+
+      if (time === "") {
+        timeTextElement.textContent = "Please enter a time";
+        allInfoFilledCorrectly = false;
+      } else {
+        timeTextElement.textContent = "";
+      }
+
+      if (allInfoFilledCorrectly === true) {
+        insertBooking();
+      } else {
+        resultTextElement.textContent = "";
+      }
+    }
+
+    // Create all of the variables which will be accessed by function
+    var tableContainerElement = document.getElementById("tableContainer")
+    var tableElement = document.getElementById("myTable");
+    var tableTextElement = document.getElementById("tableText");
+    var acceptButton = document.getElementById("acceptButton");
+    var rejectButton = document.getElementById("rejectButton");
+    var buttonTextElement = document.getElementById("buttonText");
+
+    var dateTextElement = document.getElementById("dateText");
+    var timeTextElement = document.getElementById("timeText");
+    var locationTextElement = document.getElementById("locationText");
+    var createBookingButton = document.getElementById("createBookingButton");
+    var resultTextElement = document.getElementById("resultText");
+
+    // Access the database
+    var firebaseConfig = {
+      apiKey: "AIzaSyCbo5IPc1TL0rKKcG16BYBI2bRueYof8rc",
+      authDomain: "ad-astra-test1.firebaseapp.com",
+      databaseURL: "https://ad-astra-test1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "ad-astra-test1",
+      storageBucket: "ad-astra-test1.appspot.com",
+      messagingSenderId: "754196429203",
+      appId: "1:754196429203:web:e192d5608e0c3ef1005066"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const dbref = ref(db);
+
+    // Fill the table with the requested bookings
+    var requests = [
+      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+    ];
+
+    get(child(dbref, "test-assessments/"))
+      .then((snapshot) => {
+        snapshot.forEach(child => {
+          if (child.val().status == "requested") {
+            var firstName = child.val()["first-name"];
+            var lastName = child.val()["last-name"];
+            var email = child.val().email;
+            var comment = child.val().comment;
+            var location = child.val().location;
+            var date = child.val().date;
+            var time = child.val().time;
+
+            requests.push([firstName, lastName, email, comment, location, date, time])
+          }
+        });
+        // If requests exist then create the table showing all their details and set up the buttons
+        if (requests.length > 1) {
+          // Create table rows and cells from the 2D array
+          for (var i = 0; i < requests.length; i++) {
+            var row = tableElement.insertRow();
+            for (var j = 0; j < requests[0].length; j++) {
+              var cell = row.insertCell();
+              if (j != requests[0].length - 1 || i == 0) {
+                cell.innerHTML = requests[i][j];
+              } else {
+                cell.innerHTML = i;
+              }
+            }
+          }
+        } else {
+          tableContainerElement.style.display = "none";
+          tableTextElement.textContent = "No booking requests";
+        }
+      })
+
+    acceptButton.addEventListener("click", acceptBooking);
+    rejectButton.addEventListener("click", rejectBooking);
+
+    createBookingButton.addEventListener("click", processInputs);
+  </script>
+</body>
+
+</html>
