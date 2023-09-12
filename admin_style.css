@@ -1,0 +1,58 @@
+/* Center all headings and use Cambria font */
+h2 {
+    text-align: center;
+    font-family: Cambria, sans-serif;
+  }
+  
+  /* Style buttons with hints of blues and greys */
+  button {
+    display: block; /* Make buttons a block-level element for center alignment */
+    margin: 0 auto; /* Center-align buttons horizontally */
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+    border-radius: 5px;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  #createBookingButton {
+    display: block;
+    margin: 0 auto;
+  }
+  
+  
+  /* Make fields larger and spaced out */
+  input[type="date"],
+  input[type="text"],
+  select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Style field labels in Cambria font */
+  label {
+    font-family: Cambria, sans-serif;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  /* Additional styling for table headers and cells */
+  th,
+  td {
+    border: 1px solid black;
+    text-align: center;
+  }
+  
+  /* Center align table headers */
+  th {
+    text-align: center;
+  }
