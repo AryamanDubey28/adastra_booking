@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Book a Crash Course</title>
+
+  <!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="assessment_booking_style.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+
+<body>
+  <h2>Book a Crash Course</h2>
+
+  <div class="inputContainer" id="detailContainer">
+    <input id="firstName" placeholder="First Name">
+    <p id="firstNameText" style="margin-top: 0; color:red"></p>
+    <input id="lastName" placeholder="Last Name">
+    <p id="lastNameText" style="margin-top: 0; color:red"></p>
+    <input id="email" placeholder="Email">
+    <p id="emailText" style="margin-top: 0; color:red"></p>
+    <input id="confirmEmail" placeholder="Confirm Email">
+    <p id="confirmEmailText" style="margin-top: 0; color:red"></p>
+    <input id="comment" placeholder="Comment">
+    <p id="commentText" style="margin-top: 0; color:red"></p>
+    <p style="margin-bottom: 0">Select a location:</p>
+    <select id="location">
+      <option value="Burnham Centre">Burnham Centre</option>
+    </select><br>
+    <p style="margin-bottom: 0">Select a date:</p>
+    <input id="datepicker">
+    <p id="dateText" style="margin-top: 0; color:red"></p>
+    <div id="radioContainer"></div>
+    <p id="radioText" style="margin-top: 0; color:red"></p>
+    <p>*Space for payments*<br>Note: at the end of "processInputs()" function the "requestBooking()" function is called if all of the previous boxes are filled correctly. However taking money using the API works, it can call the "requestBooking()" function itself if the money is paid.</p>
+    <button id="requestButton">Request Booking</button>
+  </div>
+
+  <p id="resultText"></p>
+
+
+  <script type="module">
+    // Importing
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
+    import { getDatabase, ref, get, set, child, update, remove }
+      from "https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js"
+
+    // Functions
+
+    // Function to convert the location into the format it is stored as in the title of the booking
+    function replaceSpacesWithHyphens(inputString) {
+      return inputString.replace(/ /g, "-");
+    }
+
+    // Function to test if a date string is after today
+    function isDateAfterToday(dateString) {
+      var parts = dateString.split("-");
+      var day = parseInt(parts[0], 10);
+      var month = parseInt(parts[1], 10);
+      var year = parseInt(parts[2], 10);
+      var inputDate = new Date(year, month - 1, day); // Month is 0-indexed
+      var today = new Date();
+      return inputDate > today;
+    }
+
+    // Function to update a booking to show that is requested and store all of the information of the booker
+    function requestBooking() {
+      var firstName = document.getElementById("firstName").value;
+      var lastName = document.getElementById("lastName").value;
+      var email = document.getElementById("email").value;
+      var confirmEmail = document.getElementById("confirmEmail").value;
+      var comment = document.getElementById("comment").value;
+      var location = document.getElementById("location").value;
+      var date = document.getElementById("datepicker").value;
+      var selectedTime = document.querySelector('input[name="options"]:checked');
+      var time = selectedTime.value;
+
+      set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+        "first-name": firstName,
+        "last-name": lastName,
+        "email": email,
+        "comment": comment,
+        "status": "requested",
+        "location": location,
+        "date": date,
+        "time": time
+      })
+
+      detailContainerElement.style.display = "none";
+
+      resultTextElement.style.color = "green";
+      resultTextElement.textContent = "Booking request on " + date + " at " + time + " in " + "Burnham Centre" + " was successful. You will recieve an email once your request has been processed.";
+    }
+
+    // Function to add the times once a date has been selected
+    function showTimes() {
+      var date = document.getElementById("datepicker").value;
+      var times = availableBookingListDict[date];
+
+      dateTextElement.textContent = "";
+
+      radioContainer.innerHTML = "Select a time:<br>";
+      times.forEach(function (time) {
+        var radioButton = document.createElement("input");
+        radioButton.type = "radio";
+        radioButton.name = "options";
+        radioButton.value = time;
+
+        var label = document.createElement("label");
+        label.textContent = time;
+
+        radioContainer.appendChild(radioButton);
+        radioContainer.appendChild(label);
+        radioContainer.appendChild(document.createElement("br"));
+      });
+    }
+
+    // Script to make the request for booking when the button is pressed
+    function processInputs() {
+      var allInfoFilledCorrectly = true;
+
+      var firstName = document.getElementById("firstName").value;
+
+      if (firstName === "") {
+        firstNameTextElement.textContent = "Please enter your first name";
+        allInfoFilledCorrectly = false;
+      } else {
+        firstNameTextElement.textContent = "";
+      }
+
+      var lastName = document.getElementById("lastName").value;
+
+      if (lastName === "") {
+        lastNameTextElement.textContent = "Please enter your last name";
+        allInfoFilledCorrectly = false;
+      } else {
+        lastNameTextElement.textContent = "";
+      }
+
+      var email = document.getElementById("email").value;
+
+      if (email === "") {
+        emailTextElement.textContent = "Please enter your email";
+        allInfoFilledCorrectly = false;
+      } else {
+        if (!emailPattern.test(email)) {
+          emailTextElement.textContent = "Please enter a valid email";
+          allInfoFilledCorrectly = false;
+        } else {
+          emailTextElement.textContent = "";
+        }
+      }
+
+      var confirmEmail = document.getElementById("confirmEmail").value;
+
+      if (confirmEmail === "") {
+        confirmEmailTextElement.textContent = "Please confirm your email";
+        allInfoFilledCorrectly = false;
+      } else {
+        if (!emailPattern.test(confirmEmail)) {
+          confirmEmailTextElement.textContent = "Please enter a valid email";
+          allInfoFilledCorrectly = false;
+        } else {
+          confirmEmailTextElement.textContent = "";
+        }
+      }
+
+      var comment = document.getElementById("comment").value;
+
+      if (comment === "") {
+        commentTextElement.textContent = "Please enter a comment";
+        allInfoFilledCorrectly = false;
+      } else {
+        commentTextElement.textContent = "";
+      }
+
+      var date = document.getElementById("datepicker").value;
+
+      if (date === "") {
+        dateTextElement.textContent = "Please select a date";
+        allInfoFilledCorrectly = false;
+      } else {
+        var selectedOption = document.querySelector('input[name="options"]:checked');
+        if (selectedOption) {
+          var selectedValue = selectedOption.value;
+          radioTextElement.textContent = "";
+        } else {
+          radioTextElement.textContent = "Please select a time";
+          allInfoFilledCorrectly = false;
+        }
+      }
+
+      if (allInfoFilledCorrectly && !(email === confirmEmail)) {
+        resultTextElement.style.color = "red";
+        resultTextElement.textContent = "Emails do not match!";
+        allInfoFilledCorrectly = false;
+      } else {
+        resultTextElement.textContent = ""
+      }
+
+      if (allInfoFilledCorrectly === true) {
+        requestBooking()
+      }
+    }
+
+    // Create all of the variables which will be accessed by function
+    var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+    var detailContainerElement = document.getElementById("detailContainer")
+
+    var firstNameTextElement = document.getElementById("firstNameText");
+    var lastNameTextElement = document.getElementById("lastNameText");
+    var emailTextElement = document.getElementById("emailText");
+    var confirmEmailTextElement = document.getElementById("confirmEmailText");
+    var commentTextElement = document.getElementById("commentText");
+    var dateTextElement = document.getElementById("dateText");
+    var radioTextElement = document.getElementById("radioText");
+
+    var requestButtonElement = document.getElementById("requestButton");
+    var resultTextElement = document.getElementById("resultText");
+
+    // Access the database
+    var firebaseConfig = {
+      apiKey: "AIzaSyCbo5IPc1TL0rKKcG16BYBI2bRueYof8rc",  //API key should not be on Github
+      authDomain: "ad-astra-test1.firebaseapp.com",
+      databaseURL: "https://ad-astra-test1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "ad-astra-test1",
+      storageBucket: "ad-astra-test1.appspot.com",
+      messagingSenderId: "754196429203",
+      appId: "1:754196429203:web:e192d5608e0c3ef1005066"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const dbref = ref(db);
+
+    // Fetch all of the available dates and times of bookings and add them to the datepicker
+    var selectableDates = [];
+    var availableBookingListDict = {};
+
+    get(child(dbref, "crash-courses/"))
+      .then((snapshot) => {
+        snapshot.forEach(child => {
+          if (child.val().status == "available" && isDateAfterToday(child.val().date)) {
+            var date = child.val().date;
+            var time = child.val().time;
+            if (!availableBookingListDict.hasOwnProperty(date)) {
+              availableBookingListDict[date] = [time];
+            } else {
+              var tempTimeList = availableBookingListDict[child.val().date];
+              tempTimeList.push(time);
+              availableBookingListDict[date] = tempTimeList;
+            }
+
+            selectableDates.push(child.val().date);
+          }
+        });
+        // Make the datepicker with the available dates found in the database
+        $(function () {
+          $("#datepicker").datepicker({
+            dateFormat: 'dd-mm-yy',
+            beforeShowDay: function (date) {
+              var formattedDate = $.datepicker.formatDate("dd-mm-yy", date);
+              return [selectableDates.includes(formattedDate)];
+            }
+          });
+        });
+      })
+
+    $("#datepicker").on("change", showTimes);
+
+    requestButtonElement.addEventListener("click", processInputs);
+  </script>
+</body>
+
+</html>
