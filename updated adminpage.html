@@ -19,8 +19,10 @@
 </head>
 
 <body>
+
   <h2>Booking Requests</h2>
   <h3>Test Assessments</h3>
+  <h4>Requests</h4>
 
   <div id="testAssessmentTableContainer">
     <table id="testAssessmentTable"></table>
@@ -33,7 +35,21 @@
 
   <p id="testAssessmentTableText" style="margin-top: 0"></p>
 
+  <h4>Accepted</h4>
+
+  <div id="testAssessmentChangeTableContainer">
+    <table id="testAssessmentChangeTable"></table>
+
+    <input id="testAssessmentChangeRow" placeholder="Row"><br>
+    <button id="testAssessmentChangeButton">Change to Reject</button>
+    <p id="testAssessmentChangeButtonText" style="margin-top: 0; color:red"></p>
+  </div>
+
+  <p id="testAssessmentChangeTableText" style="margin-top: 0"></p>
+
+
   <h3>Crash Courses</h3>
+  <h4>Requests</h4>
 
   <div id="crashCourseTableContainer">
     <table id="crashCourseTable"></table>
@@ -45,6 +61,18 @@
   </div>
 
   <p id="crashCourseTableText" style="margin-top: 0"></p>
+
+  <h4>Accepted</h4>
+
+  <div id="crashCourseChangeTableContainer">
+    <table id="crashCourseChangeTable"></table>
+
+    <input id="crashCourseChangeRow" placeholder="Row"><br>
+    <button id="crashCourseChangeButton">Change to Reject</button>
+    <p id="crashCourseChangeButtonText" style="margin-top: 0; color:red"></p>
+  </div>
+
+  <p id="crashCourseChangeTableText" style="margin-top: 0"></p>
 
   <h2>Add Available Booking</h2>
   <h3>Test Assessments</h3>
@@ -110,20 +138,20 @@
       var row = document.getElementById("testAssessmentRow").value;
 
       // If a valid row is entered then accept the request on that row
-      if (row === "" || parseInt(row) > requests.length - 1 || parseInt(row) == 0) {
+      if (row === "" || parseInt(row) > testAssessmentRequests.length - 1 || parseInt(row) == 0) {
         testAssessmentButtonTextElement.textContent = "Please enter a valid row";
       } else {
         // Remove existing error messages
         testAssessmentButtonTextElement.textContent = "";
 
         // Update the database
-        var firstName = requests[row][0];
-        var lastName = requests[row][1];
-        var email = requests[row][2];
-        var comment = requests[row][3];
-        var location = requests[row][4];
-        var date = requests[row][5];
-        var time = requests[row][6];
+        var firstName = testAssessmentRequests[row][0];
+        var lastName = testAssessmentRequests[row][1];
+        var email = testAssessmentRequests[row][2];
+        var comment = testAssessmentRequests[row][3];
+        var location = testAssessmentRequests[row][4];
+        var date = testAssessmentRequests[row][5];
+        var time = testAssessmentRequests[row][6];
 
         set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "first-name": firstName,
@@ -164,20 +192,20 @@
       var row = document.getElementById("crashCourseRow").value;
 
       // If a valid row is entered then accept the request on that row
-      if (row === "" || parseInt(row) > requests.length - 1 || parseInt(row) == 0) {
+      if (row === "" || parseInt(row) > crashCourseRequests.length - 1 || parseInt(row) == 0) {
         crashCourseButtonTextElement.textContent = "Please enter a valid row";
       } else {
         // Remove existing error messages
         crashCourseButtonTextElement.textContent = "";
 
         // Update the database
-        var firstName = requests[row][0];
-        var lastName = requests[row][1];
-        var email = requests[row][2];
-        var comment = requests[row][3];
-        var location = requests[row][4];
-        var date = requests[row][5];
-        var time = requests[row][6];
+        var firstName = crashCourseRequests[row][0];
+        var lastName = crashCourseRequests[row][1];
+        var email = crashCourseRequests[row][2];
+        var comment = crashCourseRequests[row][3];
+        var location = crashCourseRequests[row][4];
+        var date = crashCourseRequests[row][5];
+        var time = crashCourseRequests[row][6];
 
         set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "first-name": firstName,
@@ -218,16 +246,16 @@
       var row = document.getElementById("testAssessmentRow").value;
 
       // If a valid row is entered then reject the request on that row
-      if (row === "" || parseInt(row) > requests.length - 1 || parseInt(row) == 0) {
+      if (row === "" || parseInt(row) > testAssessmentRequests.length - 1 || parseInt(row) == 0) {
         testAssessmentButtonTextElement.textContent = "Please enter a valid row";
       } else {
         // Remove existing error messages
         testAssessmentButtonTextElement.textContent = "";
 
         // Update the database
-        var location = requests[row][4];
-        var date = requests[row][5];
-        var time = requests[row][6];
+        var location = testAssessmentRequests[row][4];
+        var date = testAssessmentRequests[row][5];
+        var time = testAssessmentRequests[row][6];
 
         set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "status": "available",
@@ -237,7 +265,7 @@
         })
 
         // Set the row red
-        var rows = document.querySelectorAll("#myTable tr");
+        var rows = document.querySelectorAll("#testAssessmentTable tr");
 
         var rowCells = rows[row].querySelectorAll("td");
         rowCells.forEach(function (cell) {
@@ -249,11 +277,60 @@
         document.getElementById("testAssessmentRow").value = "";
 
         // Compose an email
-        var firstName = requests[row][0];
-        var email = requests[row][2];
+        var firstName = testAssessmentRequests[row][0];
+        var email = testAssessmentRequests[row][2];
 
         var subject = "Test Assessment Response";
         var body = "Hi " + firstName + ",\n\nUnfortunately, your request for a booking on " + date + " at " + time + " in " + location + " has been rejected. Please try and request another time.\n\nRegards,\nAd Astra";
+
+        var mailtoURL = "mailto:" + encodeURIComponent(email) +
+          "?subject=" + encodeURIComponent(subject) +
+          "&body=" + encodeURIComponent(body);
+
+        window.open(mailtoURL);
+      }
+    }
+
+    function testAssessmentChangeToRejectBooking() {
+      var row = document.getElementById("testAssessmentChangeRow").value;
+
+      // If a valid row is entered then reject the request on that row
+      if (row === "" || parseInt(row) > testAssessmentAccepted.length - 1 || parseInt(row) == 0) {
+        testAssessmentChangeButtonTextElement.textContent = "Please enter a valid row";
+      } else {
+        // Remove existing error messages
+        testAssessmentChangeButtonTextElement.textContent = "";
+
+        // Update the database
+        var location = testAssessmentAccepted[row][4];
+        var date = testAssessmentAccepted[row][5];
+        var time = testAssessmentAccepted[row][6];
+
+        set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+          "status": "available",
+          "location": location,
+          "date": date,
+          "time": time
+        })
+
+        // Set the row red
+        var rows = document.querySelectorAll("#testAssessmentChangeTable tr");
+
+        var rowCells = rows[row].querySelectorAll("td");
+        rowCells.forEach(function (cell) {
+          cell.style.color = "red";
+          cell.style.fontWeight = "bold";
+        });
+
+        // Clear the row input
+        document.getElementById("testAssessmentRow").value = "";
+
+        // Compose an email
+        var firstName = testAssessmentAccepted[row][0];
+        var email = testAssessmentAccepted[row][2];
+
+        var subject = "Test Assessment Change";
+        var body = "Hi " + firstName + ",\n\nWe are very sorry to inform you that your booking on " + date + " at " + time + " in " + location + " has been changed from accepted to rejected. Please try and request another time.\n\nRegards,\nAd Astra";
 
         var mailtoURL = "mailto:" + encodeURIComponent(email) +
           "?subject=" + encodeURIComponent(subject) +
@@ -267,16 +344,16 @@
       var row = document.getElementById("crashCourseRow").value;
 
       // If a valid row is entered then reject the request on that row
-      if (row === "" || parseInt(row) > requests.length - 1 || parseInt(row) == 0) {
+      if (row === "" || parseInt(row) > crashCourse.length - 1 || parseInt(row) == 0) {
         crashCourseButtonTextElement.textContent = "Please enter a valid row";
       } else {
         // Remove existing error messages
         crashCourseButtonTextElement.textContent = "";
 
         // Update the database
-        var location = requests[row][4];
-        var date = requests[row][5];
-        var time = requests[row][6];
+        var location = crashCourseRequests[row][4];
+        var date = crashCourseRequests[row][5];
+        var time = crashCourseRequests[row][6];
 
         set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "status": "available",
@@ -298,11 +375,60 @@
         document.getElementById("crashCourseRow").value = "";
 
         // Compose an email
-        var firstName = requests[row][0];
-        var email = requests[row][2];
+        var firstName = crashCourseRequests[row][0];
+        var email = crashCourseRequests[row][2];
 
         var subject = "Crash Course Response";
         var body = "Hi " + firstName + ",\n\nUnfortunately, your request for a booking on " + date + " at " + time + " in " + location + " has been rejected. Please try and request another time.\n\nRegards,\nAd Astra";
+
+        var mailtoURL = "mailto:" + encodeURIComponent(email) +
+          "?subject=" + encodeURIComponent(subject) +
+          "&body=" + encodeURIComponent(body);
+
+        window.open(mailtoURL);
+      }
+    }
+
+    function crashCourseChangeToRejectBooking() {
+      var row = document.getElementById("crashCourseChangeRow").value;
+
+      // If a valid row is entered then reject the request on that row
+      if (row === "" || parseInt(row) > crashCourseAccepted.length - 1 || parseInt(row) == 0) {
+        crashCourseChangeButtonTextElement.textContent = "Please enter a valid row";
+      } else {
+        // Remove existing error messages
+        crashCourseChangeButtonTextElement.textContent = "";
+
+        // Update the database
+        var location = crashCourseAccepted[row][4];
+        var date = crashCourseAccepted[row][5];
+        var time = crashCourseAccepted[row][6];
+
+        set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+          "status": "available",
+          "location": location,
+          "date": date,
+          "time": time
+        })
+
+        // Set the row red
+        var rows = document.querySelectorAll("#crashCourseChangeTable tr");
+
+        var rowCells = rows[row].querySelectorAll("td");
+        rowCells.forEach(function (cell) {
+          cell.style.color = "red";
+          cell.style.fontWeight = "bold";
+        });
+
+        // Clear the row input
+        document.getElementById("crashCourseRow").value = "";
+
+        // Compose an email
+        var firstName = crashCourseAccepted[row][0];
+        var email = crashCourseAccepted[row][2];
+
+        var subject = "Crash Course Change";
+        var body = "Hi " + firstName + ",\n\nWe are very sorry to inform you that your booking on " + date + " at " + time + " in " + location + " has been changed from accepted to rejected. Please try and request another time.\n\nRegards,\nAd Astra";
 
         var mailtoURL = "mailto:" + encodeURIComponent(email) +
           "?subject=" + encodeURIComponent(subject) +
@@ -414,6 +540,12 @@
     var testAssessmentRejectButton = document.getElementById("testAssessmentRejectButton");
     var testAssessmentButtonTextElement = document.getElementById("testAssessmentButtonText");
 
+    var testAssessmentChangeTableContainerElement = document.getElementById("testAssessmentChangeTableContainer")
+    var testAssessmentChangeTableElement = document.getElementById("testAssessmentChangeTable");
+    var testAssessmentChangeTableTextElement = document.getElementById("testAssessmentChangeTableText");
+    var testAssessmentChangeButton = document.getElementById("testAssessmentChangeButton");
+    var testAssessmentChangeButtonTextElement = document.getElementById("testAssessmentChangeButtonText");
+
     var crashCourseTableContainerElement = document.getElementById("crashCourseTableContainer")
     var crashCourseTableElement = document.getElementById("crashCourseTable");
     var crashCourseTableTextElement = document.getElementById("crashCourseTableText");
@@ -421,6 +553,11 @@
     var crashCourseRejectButton = document.getElementById("crashCourseRejectButton");
     var crashCourseButtonTextElement = document.getElementById("crashCourseButtonText");
 
+    var crashCourseChangeTableContainerElement = document.getElementById("crashCourseChangeTableContainer")
+    var crashCourseChangeTableElement = document.getElementById("crashCourseChangeTable");
+    var crashCourseChangeTableTextElement = document.getElementById("crashCourseChangeTableText");
+    var crashCourseChangeButton = document.getElementById("crashCourseChangeButton");
+    var crashCourseChangeButtonTextElement = document.getElementById("crashCourseChangeButtonText");
 
     var testAssessmentDateTextElement = document.getElementById("testAssessmentDateText");
     var testAssessmentTimeTextElement = document.getElementById("testAssessmentTimeText");
@@ -450,7 +587,11 @@
     const dbref = ref(db);
 
     // Fill the test assessment table with the requested bookings
-    var requests = [
+    var testAssessmentRequests = [
+      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+    ];
+
+    var testAssessmentAccepted = [
       ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
@@ -466,18 +607,28 @@
             var date = child.val().date;
             var time = child.val().time;
 
-            requests.push([firstName, lastName, email, comment, location, date, time])
+            testAssessmentRequests.push([firstName, lastName, email, comment, location, date, time])
+          } else if (child.val().status == "accepted") {
+            var firstName = child.val()["first-name"];
+            var lastName = child.val()["last-name"];
+            var email = child.val().email;
+            var comment = child.val().comment;
+            var location = child.val().location;
+            var date = child.val().date;
+            var time = child.val().time;
+
+            testAssessmentAccepted.push([firstName, lastName, email, comment, location, date, time])
           }
         });
         // If requests exist then create the table showing all their details and set up the buttons
-        if (requests.length > 1) {
+        if (testAssessmentRequests.length > 1) {
           // Create table rows and cells from the 2D array
-          for (var i = 0; i < requests.length; i++) {
+          for (var i = 0; i < testAssessmentRequests.length; i++) {
             var row = testAssessmentTableElement.insertRow();
-            for (var j = 0; j < requests[0].length; j++) {
+            for (var j = 0; j < testAssessmentRequests[0].length; j++) {
               var cell = row.insertCell();
-              if (j != requests[0].length - 1 || i == 0) {
-                cell.innerHTML = requests[i][j];
+              if (j != testAssessmentRequests[0].length - 1 || i == 0) {
+                cell.innerHTML = testAssessmentRequests[i][j];
               } else {
                 cell.innerHTML = i;
               }
@@ -487,10 +638,33 @@
           testAssessmentTableContainerElement.style.display = "none";
           testAssessmentTableTextElement.textContent = "No booking requests";
         }
+
+        // If accepted bookings exist then create the table showing all their details and set up the buttons
+        if (testAssessmentAccepted.length > 1) {
+          // Create table rows and cells from the 2D array
+          for (var i = 0; i < testAssessmentAccepted.length; i++) {
+            var row = testAssessmentChangeTableElement.insertRow();
+            for (var j = 0; j < testAssessmentAccepted[0].length; j++) {
+              var cell = row.insertCell();
+              if (j != testAssessmentAccepted[0].length - 1 || i == 0) {
+                cell.innerHTML = testAssessmentAccepted[i][j];
+              } else {
+                cell.innerHTML = i;
+              }
+            }
+          }
+        } else {
+          testAssessmentChangeTableContainerElement.style.display = "none";
+          testAssessmentChangeTableTextElement.textContent = "No accepted bookings coming up";
+        }
       })
 
     // Fill the crash course table with the requested bookings
-    var requests = [
+    var crashCourseRequests = [
+      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+    ];
+
+    var crashCourseAccepted = [
       ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
@@ -506,18 +680,28 @@
             var date = child.val().date;
             var time = child.val().time;
 
-            requests.push([firstName, lastName, email, comment, location, date, time])
+            crashCourseRequests.push([firstName, lastName, email, comment, location, date, time])
+          } else if (child.val().status == "accepted") {
+            var firstName = child.val()["first-name"];
+            var lastName = child.val()["last-name"];
+            var email = child.val().email;
+            var comment = child.val().comment;
+            var location = child.val().location;
+            var date = child.val().date;
+            var time = child.val().time;
+
+            crashCourseAccepted.push([firstName, lastName, email, comment, location, date, time])
           }
         });
         // If requests exist then create the table showing all their details and set up the buttons
-        if (requests.length > 1) {
+        if (crashCourseRequests.length > 1) {
           // Create table rows and cells from the 2D array
-          for (var i = 0; i < requests.length; i++) {
+          for (var i = 0; i < crashCourseRequests.length; i++) {
             var row = crashCourseTableElement.insertRow();
-            for (var j = 0; j < requests[0].length; j++) {
+            for (var j = 0; j < crashCourseRequests[0].length; j++) {
               var cell = row.insertCell();
-              if (j != requests[0].length - 1 || i == 0) {
-                cell.innerHTML = requests[i][j];
+              if (j != crashCourseRequests[0].length - 1 || i == 0) {
+                cell.innerHTML = crashCourseRequests[i][j];
               } else {
                 cell.innerHTML = i;
               }
@@ -527,15 +711,38 @@
           crashCourseTableContainerElement.style.display = "none";
           crashCourseTableTextElement.textContent = "No booking requests";
         }
+
+        // If accepted bookings exist then create the table showing all their details and set up the buttons
+        if (crashCourseAccepted.length > 1) {
+          // Create table rows and cells from the 2D array
+          for (var i = 0; i < crashCourseAccepted.length; i++) {
+            var row = crashCourseChangeTableElement.insertRow();
+            for (var j = 0; j < crashCourseAccepted[0].length; j++) {
+              var cell = row.insertCell();
+              if (j != crashCourseAccepted[0].length - 1 || i == 0) {
+                cell.innerHTML = crashCourseAccepted[i][j];
+              } else {
+                cell.innerHTML = i;
+              }
+            }
+          }
+        } else {
+          crashCourseChangeTableContainerElement.style.display = "none";
+          crashCourseChangeTableTextElement.textContent = "No accepted bookings coming up";
+        }
       })
 
     testAssessmentAcceptButton.addEventListener("click", testAssessmentAcceptBooking);
     testAssessmentRejectButton.addEventListener("click", testAssessmentRejectBooking);
 
+    testAssessmentChangeButton.addEventListener("click", testAssessmentChangeToRejectBooking);
+
     testAssessmentCreateBookingButton.addEventListener("click", testAssessmentProcessInputs);
     
     crashCourseAcceptButton.addEventListener("click", crashCourseAcceptBooking);
     crashCourseRejectButton.addEventListener("click", crashCourseRejectBooking);
+
+    crashCourseChangeButton.addEventListener("click", crashCourseChangeToRejectBooking);
 
     crashCourseCreateBookingButton.addEventListener("click", crashCourseProcessInputs);
   </script>
