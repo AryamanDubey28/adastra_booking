@@ -76,6 +76,7 @@
 
   <h2>Add Available Booking</h2>
   <h3>Test Assessments</h3>
+  <h4>Single Booking</h4>
 
   <div id="testAssessmentCreateBookingContainer">
     <label for="testAssessmentDate">Date:</label>
@@ -94,7 +95,23 @@
 
   <p id="testAssessmentResultText"></p>
 
+  <h4>List of Bookings</h4>
+  <p>Insert a list in the following format:<br><br>
+    Date Time Location<br><br>
+    e.g.<br>
+    14-11-2023 12:00 London<br>
+    14-11-2023 16:00 Buenos Aires<br>
+    15-11-2023 13:00 Paris
+  </p>
+
+  <p style="color:red">Please ensure the formatting is correct before submitting.</p>
+
+  <textarea id="testAssessmentList" cols="40" rows="5"></textarea><br>
+  <button id="testAssessmentAddListButton">Add List</button>
+  <p id="testAssessmentAddListText" style="margin-top: 0; color:red"></p>
+
   <h3>Crash Courses</h3>
+  <h4>Single Booking</h4>
 
   <div id="crashCourseCreateBookingContainer">
     <label for="crashCourseDate">Date:</label>
@@ -112,7 +129,22 @@
   </div>
 
   <p id="crashCourseResultText"></p>
-  
+
+  <h4>List of Bookings</h4>
+  <p>Insert a list in the following format:<br><br>
+    Date Time Location<br><br>
+    e.g.<br>
+    14-11-2023 12:00 London<br>
+    14-11-2023 16:00 London<br>
+    15-11-2023 13:00 Paris
+  </p>
+
+  <p style="color:red">Please ensure the formatting is correct before submitting.</p>
+
+  <textarea id="crashCourseList" cols="40" rows="5"></textarea><br>
+  <button id="crashCourseAddListButton">Add List</button>
+  <p id="crashCourseAddListText" style="margin-top: 0; color:red"></p>
+
 
   <script type="module">
     // Importing
@@ -502,6 +534,38 @@
       }
     }
 
+    function testAssessmentAddList() {
+      var inputText = document.getElementById('testAssessmentList').value;
+      var lines = inputText.split('\n');
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        var parts = line.split(' ');
+
+        var date = parts[0];
+        var time = parts[1];
+        var location = "";
+
+        for (var j = 2; j < parts.length; j++) {
+          if (j > 2) {
+            location = location.concat(" ")
+          }
+          location = location.concat(parts[j])
+        }
+
+        set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+          "status": "available",
+          "location": location,
+          "date": date,
+          "time": time
+        })
+      }
+
+      testAssessmentAddListTextElement.style.color = "green";
+      testAssessmentAddListTextElement.textContent = "Added new test assessment bookings (assuming the format was correct).";
+      document.getElementById("testAssessmentList").value = "";
+    }
+
     function crashCourseProcessInputs() {
       var allInfoFilledCorrectly = true;
 
@@ -530,6 +594,38 @@
       } else {
         crashCourseResultTextElement.textContent = "";
       }
+    }
+
+    function crashCourseAddList() {
+      var inputText = document.getElementById('crashCourseList').value;
+      var lines = inputText.split('\n');
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        var parts = line.split(' ');
+
+        var date = parts[0];
+        var time = parts[1];
+        var location = "";
+
+        for (var j = 2; j < parts.length; j++) {
+          if (j > 2) {
+            location = location.concat(" ")
+          }
+          location = location.concat(parts[j])
+        }
+
+        set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+          "status": "available",
+          "location": location,
+          "date": date,
+          "time": time
+        })
+      }
+
+      crashCourseAddListTextElement.style.color = "green";
+      crashCourseAddListTextElement.textContent = "Added new crash course bookings (assuming the format was correct).";
+      document.getElementById("crashCourseList").value = "";
     }
 
     // Create all of the variables which will be accessed by function
@@ -565,11 +661,17 @@
     var testAssessmentCreateBookingButton = document.getElementById("testAssessmentCreateBookingButton");
     var testAssessmentResultTextElement = document.getElementById("testAssessmentResultText");
 
+    var testAssessmentAddListButtonElement = document.getElementById('testAssessmentAddListButton');
+    var testAssessmentAddListTextElement = document.getElementById('testAssessmentAddListText');
+
     var crashCourseDateTextElement = document.getElementById("crashCourseDateText");
     var crashCourseTimeTextElement = document.getElementById("crashCourseTimeText");
     var crashCourseLocationTextElement = document.getElementById("crashCourseLocationText");
     var crashCourseCreateBookingButton = document.getElementById("crashCourseCreateBookingButton");
     var crashCourseResultTextElement = document.getElementById("crashCourseResultText");
+
+    var crashCourseAddListButtonElement = document.getElementById('crashCourseAddListButton');
+    var crashCourseAddListTextElement = document.getElementById('crashCourseAddListText');
 
     // Access the database
     var firebaseConfig = {
@@ -738,13 +840,17 @@
     testAssessmentChangeButton.addEventListener("click", testAssessmentChangeToRejectBooking);
 
     testAssessmentCreateBookingButton.addEventListener("click", testAssessmentProcessInputs);
-    
+
+    testAssessmentAddListButtonElement.addEventListener("click", testAssessmentAddList);
+
     crashCourseAcceptButton.addEventListener("click", crashCourseAcceptBooking);
     crashCourseRejectButton.addEventListener("click", crashCourseRejectBooking);
 
     crashCourseChangeButton.addEventListener("click", crashCourseChangeToRejectBooking);
 
     crashCourseCreateBookingButton.addEventListener("click", crashCourseProcessInputs);
+
+    crashCourseAddListButtonElement.addEventListener("click", crashCourseAddList);
   </script>
 </body>
 
