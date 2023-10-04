@@ -1,21 +1,114 @@
 /* Center all headings and use Cambria font */
 h2 {
-    text-align: center;
-    font-family: Cambria, sans-serif;
-  }
+  text-align: center;
+  font-family: Cambria, sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  color: #070707;
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+/* Style for h3 headings */
+h3 {
+  text-align: center;
+  font-family: Cambria, sans-serif;
+  background-color: #f5f5f5;
+  padding: 10px;
+  color: #333;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+h4 {
+  margin-top: 20px;
+}
+
+/* Style buttons with hints of blues and greys */
+button {
+  display: block;
+  margin: 0 auto;
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  margin: 5px;
+  border-radius: 5px;
+}
+
+/* Style for tables */
+table {
+  border-collapse: collapse;
+  width: calc(100% - 40px);
+  padding: 20px;
+  overflow: auto;
+  margin-bottom: 20px;
+  border-radius: 10px; /* Rounded corners for the table */
+}
+
+th, td {
+  border: 1px solid black;
+  padding: 15px;
+  text-align: center;
+}
+
+
+/* Style for Accept and Reject buttons */
+#testAssessmentAcceptButton, #testAssessmentRejectButton,
+#crashCourseAcceptButton, #crashCourseRejectButton,
+#testAssessmentChangeButton, #crashCourseChangeButton {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  font-size: smaller;
+}
+
+#testAssessmentAcceptButton:hover, #crashCourseAcceptButton:hover,
+#testAssessmentRejectButton:hover, #crashCourseRejectButton:hover,
+#testAssessmentChangeButton:hover, #crashCourseChangeButton:hover {
+  background-color: #45a049;
+}
+
+/* Style for table headers */
+th {
+  background-color: #f2f2f2;
+}
+
+/* Style for the "Add List" button */
+#testAssessmentAddListButton, #crashCourseAddListButton {
+  background-color: #008CBA; /* Blue */
+  color: white;
+  font-size: medium;
+}
+
+#testAssessmentAddListButton:hover, #crashCourseAddListButton:hover {
+  background-color: #006699;
+}
+
+/* Style for the "Create Booking" button */
+#testAssessmentCreateBookingButton, #crashCourseCreateBookingButton {
+  background-color: #f44336; /* Red */
+  color: white;
+  font-size: medium;
+}
+
+#testAssessmentCreateBookingButton:hover, #crashCourseCreateBookingButton:hover {
+  background-color: #d32f2f;
+}
+
+/* Style for the text area */
+textarea {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
   
-  /* Style buttons with hints of blues and greys */
-  button {
-    display: block; /* Make buttons a block-level element for center alignment */
-    margin: 0 auto; /* Center-align buttons horizontally */
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    margin: 5px;
-    border-radius: 5px;
-  }
+}
+
+/* Style for error messages */
+p[style^="margin-top: 0; color:red"] {
+  color: red;
+}
+
   
   button:hover {
     background-color: #0056b3;
