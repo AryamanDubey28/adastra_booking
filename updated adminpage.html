@@ -11,7 +11,7 @@
     }
   </style>
 
- 
+  <!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
   <link rel="stylesheet" href="admin_style.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -99,12 +99,10 @@
   <p>Insert a list in the following format:<br><br>
     Date Time Location<br><br>
     e.g.<br>
-    14-11-2023 12:00 Burnham Centre<br>
-    14-11-2023 16:00 Wycombe Centre<br>
-    15-11-2023 13:00 Reading
+    14-11-2023 12:00 London<br>
+    14-11-2023 16:00 Buenos Aires<br>
+    15-11-2023 13:00 Paris
   </p>
-
-  <p style="color:red">Please ensure the formatting is correct before submitting.</p>
 
   <textarea id="testAssessmentList" cols="40" rows="5"></textarea><br>
   <button id="testAssessmentAddListButton">Add List</button>
@@ -134,12 +132,10 @@
   <p>Insert a list in the following format:<br><br>
     Date Time Location<br><br>
     e.g.<br>
-    14-11-2023 12:00 Burnham Centre<br>
-    14-11-2023 16:00 Wycombe Centre<br>
-    15-11-2023 13:00 Reading
+    14-11-2023 12:00 London<br>
+    14-11-2023 16:00 London<br>
+    15-11-2023 13:00 Paris
   </p>
-
-  <p style="color:red">Please ensure the formatting is correct before submitting.</p>
 
   <textarea id="crashCourseList" cols="40" rows="5"></textarea><br>
   <button id="crashCourseAddListButton">Add List</button>
@@ -537,33 +533,59 @@
     function testAssessmentAddList() {
       var inputText = document.getElementById('testAssessmentList').value;
       var lines = inputText.split('\n');
+      var pattern = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} .+$/;
+      var linesGood = true
+      var linesWithProblem = []
 
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
-        var parts = line.split(' ');
-
-        var date = parts[0];
-        var time = parts[1];
-        var location = "";
-
-        for (var j = 2; j < parts.length; j++) {
-          if (j > 2) {
-            location = location.concat(" ")
-          }
-          location = location.concat(parts[j])
+        if (pattern.test(line) == false) {
+          linesGood = false;
+          var lineNumber = i + 1;
+          linesWithProblem.push(lineNumber.toString())
         }
-
-        set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
-          "status": "available",
-          "location": location,
-          "date": date,
-          "time": time
-        })
       }
 
-      testAssessmentAddListTextElement.style.color = "green";
-      testAssessmentAddListTextElement.textContent = "Added new test assessment bookings (assuming the format was correct).";
-      document.getElementById("testAssessmentList").value = "";
+      if (linesGood == true) {
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          var parts = line.split(' ');
+
+          var date = parts[0];
+          var time = parts[1];
+          var location = "";
+
+          for (var j = 2; j < parts.length; j++) {
+            if (j > 2 && parts[j].length > 0) {
+              location = location.concat(" ");
+            }
+            location = location.concat(parts[j]);
+          }
+
+          set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+            "status": "available",
+            "location": location,
+            "date": date,
+            "time": time
+          })
+        }
+
+        testAssessmentAddListTextElement.style.color = "green";
+        testAssessmentAddListTextElement.textContent = "Added new test assessment bookings.";
+        document.getElementById("testAssessmentList").value = "";
+      } else {
+        testAssessmentAddListTextElement.style.color = "red";
+        var errorMessage = "Error on lines: "
+        for (var i = 0; i < linesWithProblem.length; i++) {
+          errorMessage = errorMessage.concat(linesWithProblem[i])
+          if (i < linesWithProblem.length - 1) {
+            errorMessage = errorMessage.concat(", ")
+          } else {
+            errorMessage = errorMessage.concat(".")
+          }
+        }
+        testAssessmentAddListTextElement.textContent = errorMessage;
+      }
     }
 
     function crashCourseProcessInputs() {
@@ -599,33 +621,59 @@
     function crashCourseAddList() {
       var inputText = document.getElementById('crashCourseList').value;
       var lines = inputText.split('\n');
+      var pattern = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} .+$/;
+      var linesGood = true
+      var linesWithProblem = []
 
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
-        var parts = line.split(' ');
-
-        var date = parts[0];
-        var time = parts[1];
-        var location = "";
-
-        for (var j = 2; j < parts.length; j++) {
-          if (j > 2) {
-            location = location.concat(" ")
-          }
-          location = location.concat(parts[j])
+        if (pattern.test(line) == false) {
+          linesGood = false;
+          var lineNumber = i + 1;
+          linesWithProblem.push(lineNumber.toString())
         }
-
-        set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
-          "status": "available",
-          "location": location,
-          "date": date,
-          "time": time
-        })
       }
 
-      crashCourseAddListTextElement.style.color = "green";
-      crashCourseAddListTextElement.textContent = "Added new crash course bookings (assuming the format was correct).";
-      document.getElementById("crashCourseList").value = "";
+      if (linesGood == true) {
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          var parts = line.split(' ');
+
+          var date = parts[0];
+          var time = parts[1];
+          var location = "";
+
+          for (var j = 2; j < parts.length; j++) {
+            if (j > 2 && parts[j].length > 0) {
+              location = location.concat(" ");
+            }
+            location = location.concat(parts[j]);
+          }
+
+          set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+            "status": "available",
+            "location": location,
+            "date": date,
+            "time": time
+          })
+        }
+
+        crashCourseAddListTextElement.style.color = "green";
+        crashCourseAddListTextElement.textContent = "Added new crash course bookings.";
+        document.getElementById("crashCourseList").value = "";
+      } else {
+        crashCourseAddListTextElement.style.color = "red";
+        var errorMessage = "Error on lines: "
+        for (var i = 0; i < linesWithProblem.length; i++) {
+          errorMessage = errorMessage.concat(linesWithProblem[i])
+          if (i < linesWithProblem.length - 1) {
+            errorMessage = errorMessage.concat(", ")
+          } else {
+            errorMessage = errorMessage.concat(".")
+          }
+        }
+        crashCourseAddListTextElement.textContent = errorMessage;
+      }
     }
 
     // Create all of the variables which will be accessed by function
