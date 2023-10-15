@@ -86,9 +86,23 @@
     <input type="text" id="testAssessmentTime"><br>
     <p id="testAssessmentTimeText" style="margin-top: 0; color:red"></p>
     <label for="testAssessmentLocation">Location:</label>
-    <select id="testAssessmentLocation">
-      <option value="Burnham Centre">Burnham Centre</option>
-    </select><br><br>
+    <select id="testAssessmentLocation"></select><br><br>
+
+    <script>
+      // Your list of options
+      var testAssessmentOptionsList = ["Burnham Centre"];
+
+      // Get the select element by its ID
+      var testAssessmentSelectElement = document.getElementById("testAssessmentLocation");
+
+      // Loop through the optionsList and create an <option> element for each item
+      for (var i = 0; i < testAssessmentOptionsList.length; i++) {
+        var option = document.createElement("option");
+        option.value = testAssessmentOptionsList[i]; // Set the value for each option
+        option.text = testAssessmentOptionsList[i];  // Set the text for each option
+        testAssessmentSelectElement.appendChild(option); // Append the option to the select element
+      }
+    </script>
 
     <button id="testAssessmentCreateBookingButton">Create Booking</button>
   </div>
@@ -119,9 +133,23 @@
     <input type="text" id="crashCourseTime"><br>
     <p id="crashCourseTimeText" style="margin-top: 0; color:red"></p>
     <label for="crashCourseLocation">Location:</label>
-    <select id="crashCourseLocation">
-      <option value="Burnham Centre">Burnham Centre</option>
-    </select><br><br>
+    <select id="crashCourseLocation"></select><br><br>
+
+    <script>
+      // Your list of options
+      var crashCourseOptionsList = ["Burnham Centre"];
+
+      // Get the select element by its ID
+      var crashCourseSelectElement = document.getElementById("crashCourseLocation");
+
+      // Loop through the optionsList and create an <option> element for each item
+      for (var i = 0; i < crashCourseOptionsList.length; i++) {
+        var option = document.createElement("option");
+        option.value = crashCourseOptionsList[i]; // Set the value for each option
+        option.text = crashCourseOptionsList[i];  // Set the text for each option
+        crashCourseSelectElement.appendChild(option); // Append the option to the select element
+      }
+    </script>
 
     <button id="crashCourseCreateBookingButton">Create Booking</button>
   </div>
