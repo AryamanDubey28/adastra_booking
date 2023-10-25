@@ -185,6 +185,21 @@
       return date;
     }
 
+    // Function to sort items by their centre
+    function sortItems(a, b) {
+      var itemA = a[5].toUpperCase(); // 5 represnts that the location is the 6th element in each 
+      var itemB = b[5].toUpperCase();
+
+      if (itemA < itemB) {
+        return -1;
+      }
+      if (itemA > itemB) {
+        return 1;
+      }
+
+      return 0;
+    }
+
     // Function to convert the location into the format it is stored as in the title of the booking
     function replaceSpacesWithHyphens(inputString) {
       return inputString.replace(/ /g, "-");
@@ -204,15 +219,17 @@
         var firstName = testAssessmentRequests[row][0];
         var lastName = testAssessmentRequests[row][1];
         var email = testAssessmentRequests[row][2];
-        var comment = testAssessmentRequests[row][3];
-        var location = testAssessmentRequests[row][4];
-        var date = testAssessmentRequests[row][5];
-        var time = testAssessmentRequests[row][6];
+        var phoneNumber = testAssessmentRequests[row][3];
+        var comment = testAssessmentRequests[row][4];
+        var location = testAssessmentRequests[row][5];
+        var date = testAssessmentRequests[row][6];
+        var time = testAssessmentRequests[row][7];
 
         set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "first-name": firstName,
           "last-name": lastName,
           "email": email,
+          "phone-number": phoneNumber,
           "comment": comment,
           "status": "accepted",
           "location": location,
@@ -258,15 +275,17 @@
         var firstName = crashCourseRequests[row][0];
         var lastName = crashCourseRequests[row][1];
         var email = crashCourseRequests[row][2];
-        var comment = crashCourseRequests[row][3];
-        var location = crashCourseRequests[row][4];
-        var date = crashCourseRequests[row][5];
-        var time = crashCourseRequests[row][6];
+        var phoneNumber = crashCourseRequests[row][3];
+        var comment = crashCourseRequests[row][4];
+        var location = crashCourseRequests[row][5];
+        var date = crashCourseRequests[row][6];
+        var time = crashCourseRequests[row][7];
 
         set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "first-name": firstName,
           "last-name": lastName,
           "email": email,
+          "phone-number": phoneNumber,
           "comment": comment,
           "status": "accepted",
           "location": location,
@@ -765,12 +784,16 @@
     const dbref = ref(db);
 
     // Fill the test assessment table with the requested bookings
+    var tempTestAssessmentRequests = [];
+
     var testAssessmentRequests = [
-      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+      ["First Name", "Last Name", "Email", "Phone Number", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
+    var tempTestAssessmentAccepted = [];
+
     var testAssessmentAccepted = [
-      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+      ["First Name", "Last Name", "Email", "Phone Number", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
     get(child(dbref, "test-assessments/"))
@@ -780,24 +803,39 @@
             var firstName = child.val()["first-name"];
             var lastName = child.val()["last-name"];
             var email = child.val().email;
+            var phoneNumber = child.val()["phone-number"];
             var comment = child.val().comment;
             var location = child.val().location;
             var date = child.val().date;
             var time = child.val().time;
 
-            testAssessmentRequests.push([firstName, lastName, email, comment, location, date, time])
+            tempTestAssessmentRequests.push([firstName, lastName, email, phoneNumber, comment, location, date, time])
           } else if (child.val().status == "accepted") {
             var firstName = child.val()["first-name"];
             var lastName = child.val()["last-name"];
             var email = child.val().email;
+            var phoneNumber = child.val()["phone-number"];
             var comment = child.val().comment;
             var location = child.val().location;
             var date = child.val().date;
             var time = child.val().time;
 
-            testAssessmentAccepted.push([firstName, lastName, email, comment, location, date, time])
+            tempTestAssessmentAccepted.push([firstName, lastName, email, phoneNumber, comment, location, date, time])
           }
         });
+
+        tempTestAssessmentRequests.sort(sortItems);
+
+        for (var i = 0; i < tempTestAssessmentRequests.length; i++) {
+          testAssessmentRequests.push(tempTestAssessmentRequests[i])
+        }
+
+        tempTestAssessmentAccepted.sort(sortItems);
+
+        for (var i = 0; i < tempTestAssessmentAccepted.length; i++) {
+          testAssessmentAccepted.push(tempTestAssessmentAccepted[i])
+        }
+
         // If requests exist then create the table showing all their details and set up the buttons
         if (testAssessmentRequests.length > 1) {
           // Create table rows and cells from the 2D array
@@ -838,12 +876,17 @@
       })
 
     // Fill the crash course table with the requested bookings
+
+    var tempCrashCourseRequests = [];
+
     var crashCourseRequests = [
-      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+      ["First Name", "Last Name", "Email", "Phone Number", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
+    var tempCrashCourseAccepted = [];
+
     var crashCourseAccepted = [
-      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+      ["First Name", "Last Name", "Email", "Phone Number", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
     get(child(dbref, "crash-courses/"))
@@ -853,24 +896,39 @@
             var firstName = child.val()["first-name"];
             var lastName = child.val()["last-name"];
             var email = child.val().email;
+            var phoneNumber = child.val()["phone-number"];
             var comment = child.val().comment;
             var location = child.val().location;
             var date = child.val().date;
             var time = child.val().time;
 
-            crashCourseRequests.push([firstName, lastName, email, comment, location, date, time])
+            tempCrashCourseRequests.push([firstName, lastName, email, phoneNumber, comment, location, date, time])
           } else if (child.val().status == "accepted") {
             var firstName = child.val()["first-name"];
             var lastName = child.val()["last-name"];
             var email = child.val().email;
+            var phoneNumber = child.val()["phone-number"];
             var comment = child.val().comment;
             var location = child.val().location;
             var date = child.val().date;
             var time = child.val().time;
 
-            crashCourseAccepted.push([firstName, lastName, email, comment, location, date, time])
+            tempCrashCourseAccepted.push([firstName, lastName, email, phoneNumber, comment, location, date, time])
           }
         });
+
+        tempCrashCourseRequests.sort(sortItems);
+
+        for (var i = 0; i < tempCrashCourseRequests.length; i++) {
+          crashCourseRequests.push(tempCrashCourseRequests[i])
+        }
+
+        tempCrashCourseAccepted.sort(sortItems);
+
+        for (var i = 0; i < tempCrashCourseAccepted.length; i++) {
+          crashCourseAccepted.push(tempCrashCourseAccepted[i])
+        }
+
         // If requests exist then create the table showing all their details and set up the buttons
         if (crashCourseRequests.length > 1) {
           // Create table rows and cells from the 2D array
