@@ -90,7 +90,7 @@
 
     <script>
       // Your list of options
-      var testAssessmentOptionsList = ["Burnham Centre"];
+      var testAssessmentOptionsList = ["Burnham Centre", "Royal Grammar School"];
 
       // Get the select element by its ID
       var testAssessmentSelectElement = document.getElementById("testAssessmentLocation");
@@ -113,9 +113,9 @@
   <p>Insert a list in the following format:<br><br>
     Date Time Location<br><br>
     e.g.<br>
-    14-11-2023 12:00 London<br>
-    14-11-2023 16:00 Buenos Aires<br>
-    15-11-2023 13:00 Paris
+    14-11-2023 12:00 Royal Grammar School<br>
+    14-11-2023 16:00 Burnham Centre<br>
+    15-11-2023 13:00 Burnham Centre
   </p>
 
   <textarea id="testAssessmentList" cols="40" rows="5"></textarea><br>
@@ -589,7 +589,28 @@
         if (pattern.test(line) == false) {
           linesGood = false;
           var lineNumber = i + 1;
-          linesWithProblem.push(lineNumber.toString())
+          var lineNumberStr = lineNumber.toString();
+          var lineNumberAndErrorReason = lineNumberStr.concat(" (incorrect date/time format)");
+          linesWithProblem.push(lineNumberAndErrorReason);
+        } else {
+          var parts = line.split(' ');
+
+          var location = "";
+
+          for (var j = 2; j < parts.length; j++) {
+            if (j > 2 && parts[j].length > 0) {
+              location = location.concat(" ");
+            }
+            location = location.concat(parts[j]);
+          }
+
+          if (!testAssessmentOptionsList.includes(location)){
+            linesGood = false;
+          var lineNumber = i + 1;
+          var lineNumberStr = lineNumber.toString();
+          var lineNumberAndErrorReason = lineNumberStr.concat(" (location typo/not in list)");
+          linesWithProblem.push(lineNumberAndErrorReason);
+          }
         }
       }
 
@@ -677,7 +698,28 @@
         if (pattern.test(line) == false) {
           linesGood = false;
           var lineNumber = i + 1;
-          linesWithProblem.push(lineNumber.toString())
+          var lineNumberStr = lineNumber.toString();
+          var lineNumberAndErrorReason = lineNumberStr.concat(" (incorrect date/time format)");
+          linesWithProblem.push(lineNumberAndErrorReason);
+        } else {
+          var parts = line.split(' ');
+
+          var location = "";
+
+          for (var j = 2; j < parts.length; j++) {
+            if (j > 2 && parts[j].length > 0) {
+              location = location.concat(" ");
+            }
+            location = location.concat(parts[j]);
+          }
+
+          if (!crashCourseOptionsList.includes(location)){
+            linesGood = false;
+          var lineNumber = i + 1;
+          var lineNumberStr = lineNumber.toString();
+          var lineNumberAndErrorReason = lineNumberStr.concat(" (location typo/not in list)");
+          linesWithProblem.push(lineNumberAndErrorReason);
+          }
         }
       }
 
