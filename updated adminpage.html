@@ -328,9 +328,9 @@
         testAssessmentButtonTextElement.textContent = "";
 
         // Update the database
-        var location = testAssessmentRequests[row][4];
-        var date = testAssessmentRequests[row][5];
-        var time = testAssessmentRequests[row][6];
+        var location = testAssessmentRequests[row][5];
+        var date = testAssessmentRequests[row][6];
+        var time = testAssessmentRequests[row][7];
 
         set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "status": "available",
@@ -419,16 +419,16 @@
       var row = document.getElementById("crashCourseRow").value;
 
       // If a valid row is entered then reject the request on that row
-      if (row === "" || parseInt(row) > crashCourse.length - 1 || parseInt(row) == 0) {
+      if (row === "" || parseInt(row) > crashCourseRequests.length - 1 || parseInt(row) == 0) {
         crashCourseButtonTextElement.textContent = "Please enter a valid row";
       } else {
         // Remove existing error messages
         crashCourseButtonTextElement.textContent = "";
 
         // Update the database
-        var location = crashCourseRequests[row][4];
-        var date = crashCourseRequests[row][5];
-        var time = crashCourseRequests[row][6];
+        var location = crashCourseRequests[row][5];
+        var date = crashCourseRequests[row][6];
+        var time = crashCourseRequests[row][7];
 
         set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "status": "available",
