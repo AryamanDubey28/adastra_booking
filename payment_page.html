@@ -73,16 +73,29 @@
             <input type="email" id="email" name="email" required>
 
             <label for="card-number">Card Number:</label>
-            <input type="number" id="card-number" name="card-number" pattern="\d{16}" title="Enter a valid 16-digit card number" required>
+            <input type="text" id="card-number" name="card-number" pattern="\d{16}" title="Enter a valid 16-digit card number" inputmode="numeric" oninput="sanitizeCardNumber()" required>
 
             <label for="expiration-month">Expiration Month (MM):</label>
             <select id="expiration-month" name="expiration-month" required>
                 <option value="">-- Select Month --</option>
+                <?php
+                    for ($i = 1; $i <= 12; $i++) {
+                        $month = sprintf("%02d", $i); // Format as MM
+                        echo "<option value=\"$month\">$month</option>";
+                    }
+                ?>
             </select>
 
             <label for="expiration-year">Expiration Year:</label>
             <select id="expiration-year" name="expiration-year" required>
                 <option value="">-- Select Year --</option>
+                <?php
+                    $currentYear = date("Y");
+                    for ($i = 0; $i < 10; $i++) {
+                        $year = $currentYear + $i;
+                        echo "<option value=\"$year\">$year</option>";
+                    }
+                ?>
             </select>
 
             <label for="cvv">CVV:</label>
@@ -172,9 +185,14 @@
             window.location.href = 'payment_completed.html';
             return true;
         }
+
+        // Function to sanitize card number input (allow only numeric characters)
+        function sanitizeCardNumber() {
+            var cardNumberInput = document.getElementById('card-number');
+            cardNumberInput.value = cardNumberInput.value.replace(/[^\d]/g, '');
+        }
     </script>
 </body>
 </html>
-
 
 
