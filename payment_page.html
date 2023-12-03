@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        #payment-form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px; /* Increased padding for more spacing */
+            width: 300px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px; /* Increased margin for more spacing */
+            color: #555;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px; /* Increased margin for more spacing */
+            box-sizing: border-box;
+        }
+
+        #email {
+            margin-bottom: 30px; /* Increased spacing for email field */
+        }
+
+        button {
+            background-color: #3498db; /* Blue button color */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <div id="payment-form">
+        <h2>Customer Information</h2>
+        <form id="customer-info-form" onsubmit="return validateForm()">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="card-number">Card Number:</label>
+            <input type="number" id="card-number" name="card-number" pattern="\d{16}" title="Enter a valid 16-digit card number" required>
+
+            <label for="expiration-month">Expiration Month (MM):</label>
+            <select id="expiration-month" name="expiration-month" required>
+                <option value="">-- Select Month --</option>
+            </select>
+
+            <label for="expiration-year">Expiration Year:</label>
+            <select id="expiration-year" name="expiration-year" required>
+                <option value="">-- Select Year --</option>
+            </select>
+
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" required>
+
+            <button type="submit">Pay Now</button>
+        </form>
+    </div>
+
+    <script>
+        // Function to generate options for the expiration month dropdown
+        function generateMonthOptions() {
+            var monthSelect = document.getElementById('expiration-month');
+            for (var i = 1; i <= 12; i++) {
+                var monthValue = ('0' + i).slice(-2); // Format as MM
+                var option = document.createElement('option');
+                option.value = monthValue;
+                option.text = monthValue;
+                monthSelect.add(option);
+            }
+        }
+
+        // Function to generate options for the expiration year dropdown
+        function generateYearOptions() {
+            var yearSelect = document.getElementById('expiration-year');
+            var currentYear = new Date().getFullYear();
+            for (var i = 0; i < 10; i++) {
+                var yearValue = currentYear + i;
+                var option = document.createElement('option');
+                option.value = yearValue;
+                option.text = yearValue;
+                yearSelect.add(option);
+            }
+        }
+
+        // Call functions to generate options when the page loads
+        window.onload = function () {
+            generateMonthOptions();
+            generateYearOptions();
+        };
+
+        // Function to validate the form
+        function validateForm() {
+            var isValid = true;
+            var errorMessage = "Validation Errors:\n";
+
+            // Validate Card Number
+            var cardNumberInput = document.getElementById('card-number');
+            var cardNumberPattern = /^\d{16}$/;
+
+            if (!cardNumberPattern.test(cardNumberInput.value)) {
+                isValid = false;
+                errorMessage += "- Please enter a valid 16-digit card number.\n";
+            }
+
+            // Validate Expiration Date
+            var expirationMonthInput = document.getElementById('expiration-month');
+            var expirationYearInput = document.getElementById('expiration-year');
+            var currentMonth = new Date().getMonth() + 1; // Months are 0-indexed, so add 1
+
+            if (
+                parseInt(expirationYearInput.value) < new Date().getFullYear() ||
+                (parseInt(expirationYearInput.value) === new Date().getFullYear() &&
+                    parseInt(expirationMonthInput.value) < currentMonth)
+            ) {
+                isValid = false;
+                errorMessage += "- Please enter a valid expiration date.\n";
+            }
+
+            // Validate CVV
+            var cvvInput = document.getElementById('cvv');
+            var cvvPattern = /^\d{3}$/;
+
+            if (!cvvPattern.test(cvvInput.value)) {
+                isValid = false;
+                errorMessage += "- Please enter a valid 3-digit CVV.\n";
+            }
+
+            // Display error message and return false if the form is not valid
+            if (!isValid) {
+                alert(errorMessage);
+                return false;
+            }
+
+            // If all validations pass, the form is considered valid
+            alert('Payment Completed');
+            window.location.href = 'payment_completed.html';
+            return true;
+        }
+    </script>
+</body>
+</html>
+
+
+
