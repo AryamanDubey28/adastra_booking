@@ -11,7 +11,7 @@
     }
   </style>
 
- 
+  <!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
   <link rel="stylesheet" href="admin_style.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -86,9 +86,23 @@
     <input type="text" id="testAssessmentTime"><br>
     <p id="testAssessmentTimeText" style="margin-top: 0; color:red"></p>
     <label for="testAssessmentLocation">Location:</label>
-    <select id="testAssessmentLocation">
-      <option value="Burnham Centre">Burnham Centre</option>
-    </select><br><br>
+    <select id="testAssessmentLocation"></select><br><br>
+
+    <script>
+      // Your list of options
+      var testAssessmentOptionsList = ["Burnham Centre", "Royal Grammar School"];
+
+      // Get the select element by its ID
+      var testAssessmentSelectElement = document.getElementById("testAssessmentLocation");
+
+      // Loop through the optionsList and create an <option> element for each item
+      for (var i = 0; i < testAssessmentOptionsList.length; i++) {
+        var option = document.createElement("option");
+        option.value = testAssessmentOptionsList[i]; // Set the value for each option
+        option.text = testAssessmentOptionsList[i];  // Set the text for each option
+        testAssessmentSelectElement.appendChild(option); // Append the option to the select element
+      }
+    </script>
 
     <button id="testAssessmentCreateBookingButton">Create Booking</button>
   </div>
@@ -99,12 +113,10 @@
   <p>Insert a list in the following format:<br><br>
     Date Time Location<br><br>
     e.g.<br>
-    14-11-2023 12:00 Burnham Centre<br>
-    14-11-2023 16:00 Wycombe Centre<br>
-    15-11-2023 13:00 Reading
+    14-11-2023 12:00 Royal Grammar School<br>
+    14-11-2023 16:00 Burnham Centre<br>
+    15-11-2023 13:00 Burnham Centre
   </p>
-
-  <p style="color:red">Please ensure the formatting is correct before submitting.</p>
 
   <textarea id="testAssessmentList" cols="40" rows="5"></textarea><br>
   <button id="testAssessmentAddListButton">Add List</button>
@@ -121,9 +133,23 @@
     <input type="text" id="crashCourseTime"><br>
     <p id="crashCourseTimeText" style="margin-top: 0; color:red"></p>
     <label for="crashCourseLocation">Location:</label>
-    <select id="crashCourseLocation">
-      <option value="Burnham Centre">Burnham Centre</option>
-    </select><br><br>
+    <select id="crashCourseLocation"></select><br><br>
+
+    <script>
+      // Your list of options
+      var crashCourseOptionsList = ["Burnham Centre"];
+
+      // Get the select element by its ID
+      var crashCourseSelectElement = document.getElementById("crashCourseLocation");
+
+      // Loop through the optionsList and create an <option> element for each item
+      for (var i = 0; i < crashCourseOptionsList.length; i++) {
+        var option = document.createElement("option");
+        option.value = crashCourseOptionsList[i]; // Set the value for each option
+        option.text = crashCourseOptionsList[i];  // Set the text for each option
+        crashCourseSelectElement.appendChild(option); // Append the option to the select element
+      }
+    </script>
 
     <button id="crashCourseCreateBookingButton">Create Booking</button>
   </div>
@@ -134,12 +160,10 @@
   <p>Insert a list in the following format:<br><br>
     Date Time Location<br><br>
     e.g.<br>
-    14-11-2023 12:00 Burnham Centre<br>
-    14-11-2023 16:00 Wycombe Centre<br>
-    15-11-2023 13:00 Reading
+    14-11-2023 12:00 London<br>
+    14-11-2023 16:00 London<br>
+    15-11-2023 13:00 Paris
   </p>
-
-  <p style="color:red">Please ensure the formatting is correct before submitting.</p>
 
   <textarea id="crashCourseList" cols="40" rows="5"></textarea><br>
   <button id="crashCourseAddListButton">Add List</button>
@@ -161,6 +185,21 @@
       return date;
     }
 
+    // Function to sort items by their centre
+    function sortItems(a, b) {
+      var itemA = a[5].toUpperCase(); // 5 represnts that the location is the 6th element in each 
+      var itemB = b[5].toUpperCase();
+
+      if (itemA < itemB) {
+        return -1;
+      }
+      if (itemA > itemB) {
+        return 1;
+      }
+
+      return 0;
+    }
+
     // Function to convert the location into the format it is stored as in the title of the booking
     function replaceSpacesWithHyphens(inputString) {
       return inputString.replace(/ /g, "-");
@@ -180,15 +219,17 @@
         var firstName = testAssessmentRequests[row][0];
         var lastName = testAssessmentRequests[row][1];
         var email = testAssessmentRequests[row][2];
-        var comment = testAssessmentRequests[row][3];
-        var location = testAssessmentRequests[row][4];
-        var date = testAssessmentRequests[row][5];
-        var time = testAssessmentRequests[row][6];
+        var phoneNumber = testAssessmentRequests[row][3];
+        var comment = testAssessmentRequests[row][4];
+        var location = testAssessmentRequests[row][5];
+        var date = testAssessmentRequests[row][6];
+        var time = testAssessmentRequests[row][7];
 
         set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "first-name": firstName,
           "last-name": lastName,
           "email": email,
+          "phone-number": phoneNumber,
           "comment": comment,
           "status": "accepted",
           "location": location,
@@ -234,15 +275,17 @@
         var firstName = crashCourseRequests[row][0];
         var lastName = crashCourseRequests[row][1];
         var email = crashCourseRequests[row][2];
-        var comment = crashCourseRequests[row][3];
-        var location = crashCourseRequests[row][4];
-        var date = crashCourseRequests[row][5];
-        var time = crashCourseRequests[row][6];
+        var phoneNumber = crashCourseRequests[row][3];
+        var comment = crashCourseRequests[row][4];
+        var location = crashCourseRequests[row][5];
+        var date = crashCourseRequests[row][6];
+        var time = crashCourseRequests[row][7];
 
         set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "first-name": firstName,
           "last-name": lastName,
           "email": email,
+          "phone-number": phoneNumber,
           "comment": comment,
           "status": "accepted",
           "location": location,
@@ -285,9 +328,9 @@
         testAssessmentButtonTextElement.textContent = "";
 
         // Update the database
-        var location = testAssessmentRequests[row][4];
-        var date = testAssessmentRequests[row][5];
-        var time = testAssessmentRequests[row][6];
+        var location = testAssessmentRequests[row][5];
+        var date = testAssessmentRequests[row][6];
+        var time = testAssessmentRequests[row][7];
 
         set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "status": "available",
@@ -376,16 +419,16 @@
       var row = document.getElementById("crashCourseRow").value;
 
       // If a valid row is entered then reject the request on that row
-      if (row === "" || parseInt(row) > crashCourse.length - 1 || parseInt(row) == 0) {
+      if (row === "" || parseInt(row) > crashCourseRequests.length - 1 || parseInt(row) == 0) {
         crashCourseButtonTextElement.textContent = "Please enter a valid row";
       } else {
         // Remove existing error messages
         crashCourseButtonTextElement.textContent = "";
 
         // Update the database
-        var location = crashCourseRequests[row][4];
-        var date = crashCourseRequests[row][5];
-        var time = crashCourseRequests[row][6];
+        var location = crashCourseRequests[row][5];
+        var date = crashCourseRequests[row][6];
+        var time = crashCourseRequests[row][7];
 
         set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "status": "available",
@@ -537,33 +580,80 @@
     function testAssessmentAddList() {
       var inputText = document.getElementById('testAssessmentList').value;
       var lines = inputText.split('\n');
+      var pattern = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} .+$/;
+      var linesGood = true
+      var linesWithProblem = []
 
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
-        var parts = line.split(' ');
+        if (pattern.test(line) == false) {
+          linesGood = false;
+          var lineNumber = i + 1;
+          var lineNumberStr = lineNumber.toString();
+          var lineNumberAndErrorReason = lineNumberStr.concat(" (incorrect date/time format)");
+          linesWithProblem.push(lineNumberAndErrorReason);
+        } else {
+          var parts = line.split(' ');
 
-        var date = parts[0];
-        var time = parts[1];
-        var location = "";
+          var location = "";
 
-        for (var j = 2; j < parts.length; j++) {
-          if (j > 2) {
-            location = location.concat(" ")
+          for (var j = 2; j < parts.length; j++) {
+            if (j > 2 && parts[j].length > 0) {
+              location = location.concat(" ");
+            }
+            location = location.concat(parts[j]);
           }
-          location = location.concat(parts[j])
-        }
 
-        set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
-          "status": "available",
-          "location": location,
-          "date": date,
-          "time": time
-        })
+          if (!testAssessmentOptionsList.includes(location)){
+            linesGood = false;
+          var lineNumber = i + 1;
+          var lineNumberStr = lineNumber.toString();
+          var lineNumberAndErrorReason = lineNumberStr.concat(" (location typo/not in list)");
+          linesWithProblem.push(lineNumberAndErrorReason);
+          }
+        }
       }
 
-      testAssessmentAddListTextElement.style.color = "green";
-      testAssessmentAddListTextElement.textContent = "Added new test assessment bookings (assuming the format was correct).";
-      document.getElementById("testAssessmentList").value = "";
+      if (linesGood == true) {
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          var parts = line.split(' ');
+
+          var date = parts[0];
+          var time = parts[1];
+          var location = "";
+
+          for (var j = 2; j < parts.length; j++) {
+            if (j > 2 && parts[j].length > 0) {
+              location = location.concat(" ");
+            }
+            location = location.concat(parts[j]);
+          }
+
+          set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+            "status": "available",
+            "location": location,
+            "date": date,
+            "time": time
+          })
+        }
+
+        testAssessmentAddListTextElement.style.color = "green";
+        testAssessmentAddListTextElement.textContent = "Added new test assessment bookings.";
+        document.getElementById("testAssessmentList").value = "";
+      } else {
+        testAssessmentAddListTextElement.style.color = "red";
+        var errorMessage = "Error on lines: "
+        for (var i = 0; i < linesWithProblem.length; i++) {
+          errorMessage = errorMessage.concat(linesWithProblem[i])
+          if (i < linesWithProblem.length - 1) {
+            errorMessage = errorMessage.concat(", ")
+          } else {
+            errorMessage = errorMessage.concat(".")
+          }
+        }
+        testAssessmentAddListTextElement.textContent = errorMessage;
+      }
     }
 
     function crashCourseProcessInputs() {
@@ -599,33 +689,80 @@
     function crashCourseAddList() {
       var inputText = document.getElementById('crashCourseList').value;
       var lines = inputText.split('\n');
+      var pattern = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} .+$/;
+      var linesGood = true
+      var linesWithProblem = []
 
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
-        var parts = line.split(' ');
+        if (pattern.test(line) == false) {
+          linesGood = false;
+          var lineNumber = i + 1;
+          var lineNumberStr = lineNumber.toString();
+          var lineNumberAndErrorReason = lineNumberStr.concat(" (incorrect date/time format)");
+          linesWithProblem.push(lineNumberAndErrorReason);
+        } else {
+          var parts = line.split(' ');
 
-        var date = parts[0];
-        var time = parts[1];
-        var location = "";
+          var location = "";
 
-        for (var j = 2; j < parts.length; j++) {
-          if (j > 2) {
-            location = location.concat(" ")
+          for (var j = 2; j < parts.length; j++) {
+            if (j > 2 && parts[j].length > 0) {
+              location = location.concat(" ");
+            }
+            location = location.concat(parts[j]);
           }
-          location = location.concat(parts[j])
-        }
 
-        set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
-          "status": "available",
-          "location": location,
-          "date": date,
-          "time": time
-        })
+          if (!crashCourseOptionsList.includes(location)){
+            linesGood = false;
+          var lineNumber = i + 1;
+          var lineNumberStr = lineNumber.toString();
+          var lineNumberAndErrorReason = lineNumberStr.concat(" (location typo/not in list)");
+          linesWithProblem.push(lineNumberAndErrorReason);
+          }
+        }
       }
 
-      crashCourseAddListTextElement.style.color = "green";
-      crashCourseAddListTextElement.textContent = "Added new crash course bookings (assuming the format was correct).";
-      document.getElementById("crashCourseList").value = "";
+      if (linesGood == true) {
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          var parts = line.split(' ');
+
+          var date = parts[0];
+          var time = parts[1];
+          var location = "";
+
+          for (var j = 2; j < parts.length; j++) {
+            if (j > 2 && parts[j].length > 0) {
+              location = location.concat(" ");
+            }
+            location = location.concat(parts[j]);
+          }
+
+          set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+            "status": "available",
+            "location": location,
+            "date": date,
+            "time": time
+          })
+        }
+
+        crashCourseAddListTextElement.style.color = "green";
+        crashCourseAddListTextElement.textContent = "Added new crash course bookings.";
+        document.getElementById("crashCourseList").value = "";
+      } else {
+        crashCourseAddListTextElement.style.color = "red";
+        var errorMessage = "Error on lines: "
+        for (var i = 0; i < linesWithProblem.length; i++) {
+          errorMessage = errorMessage.concat(linesWithProblem[i])
+          if (i < linesWithProblem.length - 1) {
+            errorMessage = errorMessage.concat(", ")
+          } else {
+            errorMessage = errorMessage.concat(".")
+          }
+        }
+        crashCourseAddListTextElement.textContent = errorMessage;
+      }
     }
 
     // Create all of the variables which will be accessed by function
@@ -689,12 +826,16 @@
     const dbref = ref(db);
 
     // Fill the test assessment table with the requested bookings
+    var tempTestAssessmentRequests = [];
+
     var testAssessmentRequests = [
-      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+      ["First Name", "Last Name", "Email", "Phone Number", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
+    var tempTestAssessmentAccepted = [];
+
     var testAssessmentAccepted = [
-      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+      ["First Name", "Last Name", "Email", "Phone Number", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
     get(child(dbref, "test-assessments/"))
@@ -704,24 +845,39 @@
             var firstName = child.val()["first-name"];
             var lastName = child.val()["last-name"];
             var email = child.val().email;
+            var phoneNumber = child.val()["phone-number"];
             var comment = child.val().comment;
             var location = child.val().location;
             var date = child.val().date;
             var time = child.val().time;
 
-            testAssessmentRequests.push([firstName, lastName, email, comment, location, date, time])
+            tempTestAssessmentRequests.push([firstName, lastName, email, phoneNumber, comment, location, date, time])
           } else if (child.val().status == "accepted") {
             var firstName = child.val()["first-name"];
             var lastName = child.val()["last-name"];
             var email = child.val().email;
+            var phoneNumber = child.val()["phone-number"];
             var comment = child.val().comment;
             var location = child.val().location;
             var date = child.val().date;
             var time = child.val().time;
 
-            testAssessmentAccepted.push([firstName, lastName, email, comment, location, date, time])
+            tempTestAssessmentAccepted.push([firstName, lastName, email, phoneNumber, comment, location, date, time])
           }
         });
+
+        tempTestAssessmentRequests.sort(sortItems);
+
+        for (var i = 0; i < tempTestAssessmentRequests.length; i++) {
+          testAssessmentRequests.push(tempTestAssessmentRequests[i])
+        }
+
+        tempTestAssessmentAccepted.sort(sortItems);
+
+        for (var i = 0; i < tempTestAssessmentAccepted.length; i++) {
+          testAssessmentAccepted.push(tempTestAssessmentAccepted[i])
+        }
+
         // If requests exist then create the table showing all their details and set up the buttons
         if (testAssessmentRequests.length > 1) {
           // Create table rows and cells from the 2D array
@@ -762,12 +918,17 @@
       })
 
     // Fill the crash course table with the requested bookings
+
+    var tempCrashCourseRequests = [];
+
     var crashCourseRequests = [
-      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+      ["First Name", "Last Name", "Email", "Phone Number", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
+    var tempCrashCourseAccepted = [];
+
     var crashCourseAccepted = [
-      ["First Name", "Last Name", "Email", "Comment", "Location", "Date", "Time", "Row"]
+      ["First Name", "Last Name", "Email", "Phone Number", "Comment", "Location", "Date", "Time", "Row"]
     ];
 
     get(child(dbref, "crash-courses/"))
@@ -777,24 +938,39 @@
             var firstName = child.val()["first-name"];
             var lastName = child.val()["last-name"];
             var email = child.val().email;
+            var phoneNumber = child.val()["phone-number"];
             var comment = child.val().comment;
             var location = child.val().location;
             var date = child.val().date;
             var time = child.val().time;
 
-            crashCourseRequests.push([firstName, lastName, email, comment, location, date, time])
+            tempCrashCourseRequests.push([firstName, lastName, email, phoneNumber, comment, location, date, time])
           } else if (child.val().status == "accepted") {
             var firstName = child.val()["first-name"];
             var lastName = child.val()["last-name"];
             var email = child.val().email;
+            var phoneNumber = child.val()["phone-number"];
             var comment = child.val().comment;
             var location = child.val().location;
             var date = child.val().date;
             var time = child.val().time;
 
-            crashCourseAccepted.push([firstName, lastName, email, comment, location, date, time])
+            tempCrashCourseAccepted.push([firstName, lastName, email, phoneNumber, comment, location, date, time])
           }
         });
+
+        tempCrashCourseRequests.sort(sortItems);
+
+        for (var i = 0; i < tempCrashCourseRequests.length; i++) {
+          crashCourseRequests.push(tempCrashCourseRequests[i])
+        }
+
+        tempCrashCourseAccepted.sort(sortItems);
+
+        for (var i = 0; i < tempCrashCourseAccepted.length; i++) {
+          crashCourseAccepted.push(tempCrashCourseAccepted[i])
+        }
+
         // If requests exist then create the table showing all their details and set up the buttons
         if (crashCourseRequests.length > 1) {
           // Create table rows and cells from the 2D array
