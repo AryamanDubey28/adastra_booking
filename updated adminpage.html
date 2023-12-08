@@ -475,9 +475,9 @@
         crashCourseChangeButtonTextElement.textContent = "";
 
         // Update the database
-        var location = crashCourseAccepted[row][4];
-        var date = crashCourseAccepted[row][5];
-        var time = crashCourseAccepted[row][6];
+        var location = crashCourseAccepted[row][5];
+        var date = crashCourseAccepted[row][6];
+        var time = crashCourseAccepted[row][7];
 
         set(ref(db, "crash-courses/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "status": "available",
