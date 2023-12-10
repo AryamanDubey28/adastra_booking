@@ -377,9 +377,9 @@
         testAssessmentChangeButtonTextElement.textContent = "";
 
         // Update the database
-        var location = testAssessmentAccepted[row][4];
-        var date = testAssessmentAccepted[row][5];
-        var time = testAssessmentAccepted[row][6];
+        var location = testAssessmentAccepted[row][5];
+        var date = testAssessmentAccepted[row][6];
+        var time = testAssessmentAccepted[row][7];
 
         set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
           "status": "available",
