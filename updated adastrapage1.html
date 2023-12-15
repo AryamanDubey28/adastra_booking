@@ -59,13 +59,16 @@
       margin-bottom: 5px;
     }
 
-   /* Style for the confirmation section */
-.confirmation {
-  background: linear-gradient(to bottom, rgba(29, 74, 138, 0.9), rgba(52, 103, 233, 0.9));
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
+    
+    /* Add new styles for the confirmation message */
+    .confirmation {
+      background-color: #4CAF50; /* Green background */
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
 
     
   </style>
@@ -149,7 +152,41 @@
     }
 
     // Function to update a booking to show that is requested and store all of the information of the booker
-    function requestBooking() {
+//     function requestBooking() {
+//       var firstName = document.getElementById("firstName").value;
+//       var lastName = document.getElementById("lastName").value;
+//       var email = document.getElementById("email").value;
+//       var phoneNumber = document.getElementById("phoneNumber").value;
+//       var comment = document.getElementById("comment").value;
+//       var location = document.getElementById("location").value;
+//       var date = document.getElementById("datepicker").value;
+//       var selectedTime = document.querySelector('input[name="options"]:checked');
+//       var time = selectedTime.value;
+
+      // set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
+      //   "first-name": firstName,
+      //   "last-name": lastName,
+      //   "email": email,
+      //   "phone-number": phoneNumber,
+      //   "comment": comment,
+      //   "status": "requested",
+      //   "location": location,
+      //   "date": date,
+      //   "time": time
+      // })
+
+//       detailContainerElement.style.display = "none";
+
+//     // After the existing dynamic styles for the .confirmation class
+// resultTextElement.style.color = "#fff";
+// resultTextElement.style.fontFamily = "Cambria, sans-serif";
+// resultTextElement.style.background = "linear-gradient(to bottom right, rgba(29, 74, 138, 0.9), rgba(39, 84, 148, 0.7), rgba(52, 103, 233, 0.9))";
+// resultTextElement.style.backgroundRepeat = "no-repeat";
+// resultTextElement.style.backgroundSize = "100% 100%"; // Set background size to cover the entire element
+// resultTextElement.textContent = "Booking request on " + date + " at " + time + " in " + "Burnham Centre" + " was successful. You will receive an email once your request has been processed.";
+//     }
+
+function requestBooking() {
       var firstName = document.getElementById("firstName").value;
       var lastName = document.getElementById("lastName").value;
       var email = document.getElementById("email").value;
@@ -160,6 +197,7 @@
       var selectedTime = document.querySelector('input[name="options"]:checked');
       var time = selectedTime.value;
 
+      // Add your existing code for setting the data in the database
       set(ref(db, "test-assessments/" + date + ";" + time + ";" + replaceSpacesWithHyphens(location)), {
         "first-name": firstName,
         "last-name": lastName,
@@ -172,10 +210,42 @@
         "time": time
       })
 
-      detailContainerElement.style.display = "none";
+      // Clear input fields
+      clearInputFields();
 
-      resultTextElement.style.color = "green";
-      resultTextElement.textContent = "Booking request on " + date + " at " + time + " in " + "Burnham Centre" + " was successful. You will recieve an email once your request has been processed.";
+      // Display confirmation message
+      showConfirmationMessage(date, time, location);
+    }
+
+    // Function to clear input fields
+    function clearInputFields() {
+      document.getElementById("firstName").value = "";
+      document.getElementById("lastName").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("phoneNumber").value = "";
+      document.getElementById("comment").value = "";
+      document.getElementById("confirmEmail").value = "";
+      document.getElementById("confirmPhoneNumber").value = "";
+      document.getElementById("datepicker").value = "";
+      document.querySelector('input[name="options"]:checked').checked = false;
+    }
+
+    // Function to display confirmation message
+    function showConfirmationMessage(date, time, location) {
+      // Create a div for the confirmation message
+      var confirmationDiv = document.createElement("div");
+      confirmationDiv.className = "confirmation";
+      confirmationDiv.textContent =
+        "Booking request on " +
+        date +
+        " at " +
+        time +
+        " in " +
+        location +
+        " was successful. You will receive an email once your request has been processed.";
+
+      // Append the confirmation message div below the button
+      document.getElementById("detailContainer").appendChild(confirmationDiv);
     }
 
     // Function to add the times once a date has been selected
